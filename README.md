@@ -10,7 +10,7 @@ A complete real estate platform for **MEFTAHI IMMO** agency in **Bizerte, Tunisi
 - **Database**: PostgreSQL (Supabase)
 - **Authentication**: Supabase Auth
 - **Storage**: Supabase Storage
-- **Deployment**: Vercel
+- **Deployment**: Self-hosted or any Node.js platform
 
 ## ✨ Features
 
@@ -45,7 +45,6 @@ A complete real estate platform for **MEFTAHI IMMO** agency in **Bizerte, Tunisi
 - Node.js 18+ 
 - npm or yarn
 - Supabase account
-- Vercel account (for deployment)
 
 ### 1. Clone the Repository
 ```bash
@@ -132,11 +131,12 @@ See `supabase-schema.sql` for the complete schema.
 
 ## 🚀 Deployment
 
-### Deploy to Vercel
+### Deploy to Production
 
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+1. Build the application: `npm run build`
+2. Start the production server: `npm start`
+3. Set environment variables on your hosting platform
+4. Configure your domain and SSL
 
 ### Environment Variables for Production
 ```env
