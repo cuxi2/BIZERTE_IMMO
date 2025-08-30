@@ -1,103 +1,175 @@
-import Image from "next/image";
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Building2, Home, MapPin, Star } from 'lucide-react'
 
-export default function Home() {
+export default function HomePage() {
+  const propertyTypes = [
+    {
+      name: 'Appartements',
+      key: 'appartement',
+      icon: Building2,
+      description: 'Découvrez nos appartements modernes en centre-ville et quartiers résidentiels.',
+      count: '150+ biens'
+    },
+    {
+      name: 'Villas',
+      key: 'villa', 
+      icon: Home,
+      description: 'Villas familiales avec jardins dans les meilleurs quartiers de Bizerte.',
+      count: '75+ biens'
+    },
+    {
+      name: 'Studios',
+      key: 'studio',
+      icon: Building2,
+      description: 'Studios pratiques et bien situés, parfaits pour jeunes actifs.',
+      count: '80+ biens'
+    }
+  ]
+
+  const features = [
+    {
+      title: 'Expertise locale',
+      description: 'Plus de 10 ans d\'expérience sur le marché immobilier de Bizerte',
+      icon: MapPin
+    },
+    {
+      title: 'Service premium',
+      description: 'Accompagnement personnalisé de la recherche à la signature',
+      icon: Star
+    },
+    {
+      title: 'Portefeuille varié',
+      description: 'Large sélection de biens pour tous budgets et besoins',
+      icon: Building2
+    }
+  ]
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-blue-50 to-indigo-100 py-16 lg:py-24">
+        <div className="container mx-auto px-4 text-center">
+          <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/20">
+            🏡 Votre partenaire immobilier à Bizerte
+          </Badge>
+          
+          <h1 className="text-4xl lg:text-6xl font-bold mb-6 text-gray-900">
+            MEFTAHI IMMO
+          </h1>
+          
+          <p className="text-xl lg:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            Vente & Location de biens immobiliers à Bizerte – 
+            Appartements, Villas, Studios et plus encore
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/catalog">
+              <Button size="lg" className="w-full sm:w-auto">
+                🔍 Voir le catalogue
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                👤 Espace Admin
+              </Button>
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      {/* Property Types Section */}
+      <section className="py-16 lg:py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Nos types de biens</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Explorez notre large gamme de propriétés disponibles à la vente et à la location
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {propertyTypes.map((type) => {
+              const IconComponent = type.icon
+              return (
+                <Card key={type.key} className="group hover:shadow-xl transition-all duration-300 cursor-pointer">
+                  <CardContent className="p-8 text-center">
+                    <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
+                      <IconComponent className="h-8 w-8" />
+                    </div>
+                    
+                    <h3 className="text-xl font-semibold mb-2">{type.name}</h3>
+                    <p className="text-gray-600 mb-4">{type.description}</p>
+                    <Badge variant="secondary" className="mb-4">{type.count}</Badge>
+                    
+                    <Link 
+                      href={`/catalog?kind=${type.key}`}
+                      className="inline-flex items-center text-primary hover:underline font-medium"
+                    >
+                      Explorer → 
+                    </Link>
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 lg:py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Pourquoi choisir MEFTAHI IMMO ?</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Une agence de confiance au service de vos projets immobiliers
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {features.map((feature, index) => {
+              const IconComponent = feature.icon
+              return (
+                <div key={index} className="text-center">
+                  <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <IconComponent className="h-8 w-8 text-primary" />
+                  </div>
+                  
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.description}</p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 lg:py-20 bg-primary text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+            Prêt à trouver votre bien idéal ?
+          </h2>
+          <p className="text-xl mb-8 opacity-90">
+            Parcourez notre catalogue ou contactez-nous pour un accompagnement personnalisé
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/catalog">
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+                Parcourir le catalogue
+              </Button>
+            </Link>
+            <Link href="/contact">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto text-white border-white hover:bg-white hover:text-primary">
+                Nous contacter
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
-  );
+  )
 }
