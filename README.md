@@ -49,8 +49,8 @@ A complete real estate platform for **MEFTAHI IMMO** agency in **Bizerte, Tunisi
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/cuxi2/MEFTAHI_IMMO.git
-cd MEFTAHI_IMMO
+git clone https://github.com/cuxi2/BIZERTE_IMMO.git
+cd BIZERTE_IMMO
 ```
 
 ### 2. Install Dependencies
