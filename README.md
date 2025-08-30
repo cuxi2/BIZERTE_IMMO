@@ -225,4 +225,4 @@ For support or questions about MEFTAHI IMMO:
 
 ---
 
-Built with ❤️ for the Tunisian real estate market by MEFTAHI IMMO team.
+Built with ❤️ for the Tunisian real estate market by MEFTAHI IMMO team.# BIZERTE_IMMO
