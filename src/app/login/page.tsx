@@ -121,6 +121,13 @@ export default function LoginPage() {
 
             <div className="mt-6 text-center">
               <Link 
+                href="/register" 
+                className="text-sm text-muted-foreground hover:text-primary"
+              >
+                Créer un compte administrateur
+              </Link>
+              <span className="mx-2 text-muted-foreground">|</span>
+              <Link 
                 href="/" 
                 className="text-sm text-muted-foreground hover:text-primary"
               >
