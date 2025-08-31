@@ -63,7 +63,7 @@ export default function DateRangePicker({
               setIsStartOpen(false)
             }}
             disabled={(date) => 
-              date < new Date() || isDateUnavailable(date) || (endDate && date > endDate)
+              (date < new Date() || isDateUnavailable(date) || (endDate && date > endDate)) ?? false
             }
             initialFocus
             locale={fr}
@@ -95,9 +95,9 @@ export default function DateRangePicker({
               setIsEndOpen(false)
             }}
             disabled={(date) => 
-              !startDate || 
+              (!startDate || 
               date < startDate || 
-              isDateUnavailable(date)
+              isDateUnavailable(date)) ?? false
             }
             initialFocus
             locale={fr}

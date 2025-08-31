@@ -75,7 +75,7 @@ export default function ListingDetailPage() {
       // Fetch reservations for availability checking
       const { data: reservationsData } = await supabase
         .from('reservations')
-        .select('start_date, end_date, status')
+        .select('*')
         .eq('listing_id', listingData.id)
         .in('status', ['pending', 'confirmed'])
       

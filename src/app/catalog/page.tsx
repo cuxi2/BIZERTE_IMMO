@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import ListingCard from '@/components/ListingCard'
@@ -11,7 +11,7 @@ import { AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Listing, ListingFilters, PropertyKind } from '@/types/db'
 
-export default function CatalogPage() {
+function CatalogContent() {
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -240,5 +240,13 @@ export default function CatalogPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CatalogPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-8">Chargement...</div>}>
+      <CatalogContent />
+    </Suspense>
   )
 }

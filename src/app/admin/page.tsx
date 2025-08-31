@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Building2, Calendar, Users, TrendingUp, Eye, Plus } from 'lucide-react'
 import { formatPrice } from '@/utils/price'
+import { Listing } from '@/types/db'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -24,7 +25,7 @@ export default function AdminDashboard() {
     upcomingVisits: 0,
     totalRevenue: 0
   })
-  const [recentListings, setRecentListings] = useState<Database['public']['Tables']['listings']['Row'][]>([]);
+  const [recentListings, setRecentListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

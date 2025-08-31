@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react'
 import { formatPrice } from '@/utils/price'
 import { formatDate } from '@/lib/date'
-import { Listing } from '@/types/db'
+import { Listing, ListingStatus } from '@/types/db'
 import { toast } from 'sonner'
 
 export default function AdminListingsPage() {
@@ -78,7 +78,7 @@ export default function AdminListingsPage() {
 
       toast.success('Statut mis à jour')
       setListings(prev => 
-        prev.map(l => l.id === id ? { ...l, status: newStatus as string } : l)
+        prev.map(l => l.id === id ? { ...l, status: newStatus as ListingStatus } : l)
       )
     } catch (error) {
       toast.error('Erreur lors de la mise à jour')
