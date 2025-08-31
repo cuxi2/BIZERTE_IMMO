@@ -44,14 +44,8 @@ export default function LoginPage() {
           .eq('id', data.user.id)
           .single()
 
-        // Log for debugging
-        console.log('User ID:', data.user.id);
-        console.log('Profile data:', profile);
-        console.log('Profile error:', profileError);
-
         // If profile doesn't exist, create it (this shouldn't happen but let's be safe)
         if (profileError && profileError.code === 'PGRST116') {
-          console.log('Profile not found, creating one...');
           const { error: insertError } = await supabase
             .from('profiles')
             .insert({
@@ -62,7 +56,6 @@ export default function LoginPage() {
             })
           
           if (insertError) {
-            console.error('Failed to create profile:', insertError);
             setError('Une erreur est survenue lors de la création du profil')
             await supabase.auth.signOut()
             return
@@ -76,7 +69,6 @@ export default function LoginPage() {
 
         // If there's another error, show it
         if (profileError) {
-          console.error('Profile query error:', profileError);
           setError('Une erreur est survenue lors de la vérification du profil')
           await supabase.auth.signOut()
           return
