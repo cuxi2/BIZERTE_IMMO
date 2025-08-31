@@ -297,7 +297,7 @@ begin
     new.raw_user_meta_data->>'full_name', 
     new.raw_user_meta_data->>'phone',
     case 
-      when (select count(*) from public.profiles) = 0 then 'admin'
+      when (select count(*) from auth.users) = 1 then 'admin'
       else 'client'
     end
   );
