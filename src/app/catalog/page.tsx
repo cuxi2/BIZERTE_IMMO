@@ -119,17 +119,17 @@ export default function CatalogPage() {
   const totalPages = Math.ceil(totalCount / itemsPerPage)
 
   return (
-    <div className=\"container mx-auto px-4 py-8\">
-      <div className=\"mb-8\">
-        <h1 className=\"text-3xl font-bold mb-2\">Catalogue immobilier</h1>
-        <p className=\"text-muted-foreground\">
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Catalogue immobilier</h1>
+        <p className="text-muted-foreground">
           Découvrez nos {totalCount} biens disponibles à Bizerte et ses environs
         </p>
       </div>
 
-      <div className=\"grid lg:grid-cols-4 gap-8\">
+      <div className="grid lg:grid-cols-4 gap-8">
         {/* Filters Sidebar */}
-        <div className=\"lg:col-span-1\">
+        <div className="lg:col-span-1">
           <PropertyFilters
             filters={filters}
             onFiltersChange={handleFiltersChange}
@@ -139,36 +139,36 @@ export default function CatalogPage() {
         </div>
 
         {/* Listings Grid */}
-        <div className=\"lg:col-span-3\">
+        <div className="lg:col-span-3">
           {error && (
-            <Alert className=\"mb-6\">
-              <AlertCircle className=\"h-4 w-4\" />
+            <Alert className="mb-6">
+              <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
           {loading ? (
-            <div className=\"grid md:grid-cols-2 xl:grid-cols-3 gap-6\">
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
               {Array.from({ length: itemsPerPage }).map((_, index) => (
-                <div key={index} className=\"space-y-3\">
-                  <Skeleton className=\"h-48 w-full rounded-xl\" />
-                  <Skeleton className=\"h-4 w-3/4\" />
-                  <Skeleton className=\"h-4 w-1/2\" />
-                  <Skeleton className=\"h-6 w-1/3\" />
+                <div key={index} className="space-y-3">
+                  <Skeleton className="h-48 w-full rounded-xl" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-6 w-1/3" />
                 </div>
               ))}
             </div>
           ) : listings.length === 0 ? (
-            <div className=\"text-center py-12\">
-              <div className=\"text-gray-400 mb-4\">
-                <AlertCircle className=\"h-16 w-16 mx-auto\" />
+            <div className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <AlertCircle className="h-16 w-16 mx-auto" />
               </div>
-              <h3 className=\"text-lg font-semibold mb-2\">Aucun bien trouvé</h3>
-              <p className=\"text-muted-foreground mb-4\">
+              <h3 className="text-lg font-semibold mb-2">Aucun bien trouvé</h3>
+              <p className="text-muted-foreground mb-4">
                 Essayez de modifier vos critères de recherche pour voir plus de résultats.
               </p>
               <Button 
-                variant=\"outline\" 
+                variant="outline" 
                 onClick={() => {
                   setFilters({})
                   setCurrentPage(1)
@@ -180,15 +180,15 @@ export default function CatalogPage() {
           ) : (
             <>
               {/* Results Count */}
-              <div className=\"flex items-center justify-between mb-6\">
-                <p className=\"text-sm text-muted-foreground\">
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-sm text-muted-foreground">
                   {totalCount} bien{totalCount > 1 ? 's' : ''} trouvé{totalCount > 1 ? 's' : ''}
                   {totalPages > 1 && ` - Page ${currentPage} sur ${totalPages}`}
                 </p>
               </div>
 
               {/* Listings Grid */}
-              <div className=\"grid md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8\">
+              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
                 {listings.map((listing) => (
                   <ListingCard key={listing.id} listing={listing} />
                 ))}
@@ -196,9 +196,9 @@ export default function CatalogPage() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className=\"flex items-center justify-center gap-2\">
+                <div className="flex items-center justify-center gap-2">
                   <Button
-                    variant=\"outline\"
+                    variant="outline"
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   >
@@ -212,13 +212,13 @@ export default function CatalogPage() {
                       Math.abs(page - currentPage) <= 2
                     )
                     .map((page, index, array) => (
-                      <div key={page} className=\"flex items-center\">
+                      <div key={page} className="flex items-center">
                         {index > 0 && array[index - 1] !== page - 1 && (
-                          <span className=\"px-2 text-muted-foreground\">...</span>
+                          <span className="px-2 text-muted-foreground">...</span>
                         )}
                         <Button
-                          variant={currentPage === page ? \"default\" : \"outline\"}
-                          size=\"sm\"
+                          variant={currentPage === page ? "default" : "outline"}
+                          size="sm"
                           onClick={() => setCurrentPage(page)}
                         >
                           {page}
@@ -227,7 +227,7 @@ export default function CatalogPage() {
                     ))}
                   
                   <Button
-                    variant=\"outline\"
+                    variant="outline"
                     disabled={currentPage === totalPages}
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   >
