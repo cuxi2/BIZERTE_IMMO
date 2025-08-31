@@ -296,7 +296,10 @@ begin
     new.id, 
     new.raw_user_meta_data->>'full_name', 
     new.raw_user_meta_data->>'phone',
-    'admin' -- First user gets admin, others get client by default
+    case 
+      when (select count(*) from public.profiles) = 0 then 'admin'
+      else 'client'
+    end
   );
   return new;
 end;
