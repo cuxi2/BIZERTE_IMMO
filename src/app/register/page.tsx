@@ -47,21 +47,6 @@ export default function RegisterPage() {
       }
 
       if (data.user) {
-        // Create profile record
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            full_name: fullName,
-            phone: phone,
-            role: 'admin' // First user gets admin role
-          })
-
-        if (profileError) {
-          setError(profileError.message)
-          return
-        }
-
         setSuccess(true)
         toast.success('Compte créé avec succès! Veuillez vérifier votre email.')
         
@@ -98,6 +83,9 @@ export default function RegisterPage() {
               <div className="text-center py-4">
                 <p className="text-green-600 mb-4">Compte créé avec succès!</p>
                 <p className="text-sm text-muted-foreground">
+                  Veuillez vérifier votre email et vous connecter.
+                </p>
+                <p className="text-sm text-muted-foreground mt-2">
                   Vous allez être redirigé vers la page de connexion...
                 </p>
               </div>

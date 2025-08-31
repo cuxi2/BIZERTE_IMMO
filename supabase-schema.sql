@@ -284,6 +284,30 @@ using (
 );
 
 -- =========================================
+-- AUTOMATIC PROFILE CREATION
+-- =========================================
+
+-- Function to automatically create a profile when a user signs up
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, full_name, phone, role)
+  values (
+    new.id, 
+    new.raw_user_meta_data->>'full_name', 
+    new.raw_user_meta_data->>'phone',
+    'admin' -- First user gets admin, others get client by default
+  );
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- Trigger to call the function when a user is created
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- =========================================
 -- SAMPLE DATA (Optional)
 -- =========================================
 
