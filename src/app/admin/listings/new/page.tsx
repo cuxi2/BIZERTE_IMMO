@@ -162,7 +162,7 @@ export default function NewListingPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="purpose">Type d'opération *</Label>
+                <Label htmlFor="purpose">Type d&apos;opération *</Label>
                 <Select
                   value={formData.purpose}
                   onValueChange={(value: ListingPurpose) => handleInputChange('purpose', value)}

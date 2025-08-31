@@ -23,7 +23,7 @@ export default function PropertyFilters({
 }: PropertyFiltersProps) {
   const [localFilters, setLocalFilters] = useState<ListingFilters>(filters)
 
-  const handleFilterChange = (key: keyof ListingFilters, value: any) => {
+  const handleFilterChange = (key: keyof ListingFilters, value: string | number | undefined) => {
     const newFilters = { ...localFilters, [key]: value }
     setLocalFilters(newFilters)
     onFiltersChange(newFilters)
@@ -91,7 +91,7 @@ export default function PropertyFilters({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Purpose */}
         <div>
-          <label className="text-sm font-medium mb-2 block">Type d'opération</label>
+          <label className="text-sm font-medium mb-2 block">Type d&apos;opération</label>
           <Select 
             value={localFilters.purpose || ''} 
             onValueChange={(value: ListingPurpose) => handleFilterChange('purpose', value)}

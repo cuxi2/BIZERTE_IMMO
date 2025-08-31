@@ -70,7 +70,7 @@ export default function Footer() {
                 Confidentialité
               </Link>
               <Link href="/conditions" className="block hover:text-primary transition-colors">
-                Conditions d'utilisation
+                Conditions d&apos;utilisation
               </Link>
             </div>
           </div>
@@ -80,7 +80,7 @@ export default function Footer() {
 
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
           <p>© {currentYear} MEFTAHI IMMO. Tous droits réservés.</p>
-          <p>Développé avec ❤️ pour l'immobilier tunisien</p>
+          <p>Développé avec ❤️ pour l&apos;immobilier tunisien</p>
         </div>
       </div>
     </footer>

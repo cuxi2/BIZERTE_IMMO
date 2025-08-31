@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import ListingCard from '@/components/ListingCard'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Listing, ListingFilters } from '@/types/db'
+import { Listing, ListingFilters, PropertyKind } from '@/types/db'
 
 export default function CatalogPage() {
   const [listings, setListings] = useState<Listing[]>([])
@@ -34,7 +34,7 @@ export default function CatalogPage() {
       initialFilters.purpose = purpose
     }
     if (kind) {
-      initialFilters.kind = kind as any
+      initialFilters.kind = kind as PropertyKind
     }
     if (city) {
       initialFilters.city = city
@@ -44,7 +44,7 @@ export default function CatalogPage() {
   }, [searchParams])
 
   // Fetch listings based on filters
-  const fetchListings = async () => {
+  const fetchListings = useCallback(async () => {
     setLoading(true)
     setError(null)
     
@@ -100,12 +100,12 @@ export default function CatalogPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filters, currentPage])
 
   // Fetch listings when filters or page change
   useEffect(() => {
     fetchListings()
-  }, [filters, currentPage])
+  }, [fetchListings])
 
   const handleFiltersChange = (newFilters: ListingFilters) => {
     setFilters(newFilters)

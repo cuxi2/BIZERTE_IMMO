@@ -111,16 +111,18 @@ export interface CreateListingData {
   purpose: ListingPurpose;
   kind: PropertyKind;
   price: number;
-  currency?: string;
+  currency?: string; // default: 'TND'
   address?: string;
-  city?: string;
+  city: string;
   latitude?: number;
   longitude?: number;
   bedrooms?: number;
   bathrooms?: number;
   area_m2?: number;
   year_built?: number;
-  status?: ListingStatus;
+  status?: ListingStatus; // default: 'brouillon'
+  created_at?: string; // added optional
+  updated_at?: string; // added optional
 }
 
 export interface UpdateListingData extends Partial<CreateListingData> {
@@ -177,7 +179,7 @@ export interface PaginatedResponse<T> {
 }
 
 // API Response types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
