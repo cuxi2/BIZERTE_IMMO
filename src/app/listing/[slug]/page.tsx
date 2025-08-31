@@ -174,17 +174,17 @@ export default function ListingDetailPage() {
 
   if (loading) {
     return (
-      <div className=\"container mx-auto px-4 py-8\">
-        <div className=\"grid lg:grid-cols-3 gap-8\">
-          <div className=\"lg:col-span-2 space-y-6\">
-            <Skeleton className=\"h-8 w-3/4\" />
-            <Skeleton className=\"h-4 w-1/2\" />
-            <Skeleton className=\"h-64 w-full rounded-xl\" />
-            <Skeleton className=\"h-32 w-full\" />
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-64 w-full rounded-xl" />
+            <Skeleton className="h-32 w-full" />
           </div>
-          <div className=\"space-y-4\">
-            <Skeleton className=\"h-64 w-full rounded-xl\" />
-            <Skeleton className=\"h-48 w-full rounded-xl\" />
+          <div className="space-y-4">
+            <Skeleton className="h-64 w-full rounded-xl" />
+            <Skeleton className="h-48 w-full rounded-xl" />
           </div>
         </div>
       </div>
@@ -193,9 +193,9 @@ export default function ListingDetailPage() {
 
   if (error || !listing) {
     return (
-      <div className=\"container mx-auto px-4 py-8\">
+      <div className="container mx-auto px-4 py-8">
         <Alert>
-          <AlertCircle className=\"h-4 w-4\" />
+          <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error || 'Bien non trouvé'}</AlertDescription>
         </Alert>
       </div>
@@ -206,34 +206,34 @@ export default function ListingDetailPage() {
   const isForRent = listing.purpose === 'location'
 
   return (
-    <div className=\"container mx-auto px-4 py-8\">
-      <div className=\"grid lg:grid-cols-3 gap-8\">
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid lg:grid-cols-3 gap-8">
         {/* Main Content */}
-        <div className=\"lg:col-span-2 space-y-8\">
+        <div className="lg:col-span-2 space-y-8">
           {/* Header */}
           <div>
-            <div className=\"flex items-center gap-2 mb-3\">
+            <div className="flex items-center gap-2 mb-3">
               <Badge className={listing.purpose === 'vente' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}>
                 {listing.purpose}
               </Badge>
-              <Badge variant=\"outline\">{listing.kind}</Badge>
+              <Badge variant="outline">{listing.kind}</Badge>
             </div>
             
-            <h1 className=\"text-3xl lg:text-4xl font-bold mb-3\">{listing.title}</h1>
+            <h1 className="text-3xl lg:text-4xl font-bold mb-3">{listing.title}</h1>
             
-            <div className=\"flex items-center text-muted-foreground mb-4\">
-              <MapPin className=\"h-4 w-4 mr-1\" />
+            <div className="flex items-center text-muted-foreground mb-4">
+              <MapPin className="h-4 w-4 mr-1" />
               <span>{listing.address}, {listing.city}</span>
             </div>
             
-            <div className=\"flex items-center justify-between\">
-              <div className=\"text-3xl font-bold text-primary\">
+            <div className="flex items-center justify-between">
+              <div className="text-3xl font-bold text-primary">
                 {formatPrice(listing.price, listing.currency)}
-                {isForRent && <span className=\"text-lg font-normal\">/mois</span>}
+                {isForRent && <span className="text-lg font-normal">/mois</span>}
               </div>
               
               {listing.area_m2 && (
-                <div className=\"text-muted-foreground\">
+                <div className="text-muted-foreground">
                   {formatArea(listing.area_m2)}
                 </div>
               )}
@@ -249,28 +249,28 @@ export default function ListingDetailPage() {
               <CardTitle>Caractéristiques</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className=\"grid grid-cols-2 md:grid-cols-4 gap-4 mb-6\">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 {listing.bedrooms && (
-                  <div className=\"flex items-center gap-2\">
-                    <Bed className=\"h-4 w-4 text-muted-foreground\" />
+                  <div className="flex items-center gap-2">
+                    <Bed className="h-4 w-4 text-muted-foreground" />
                     <span>{listing.bedrooms} chambres</span>
                   </div>
                 )}
                 {listing.bathrooms && (
-                  <div className=\"flex items-center gap-2\">
-                    <Bath className=\"h-4 w-4 text-muted-foreground\" />
+                  <div className="flex items-center gap-2">
+                    <Bath className="h-4 w-4 text-muted-foreground" />
                     <span>{listing.bathrooms} salles de bain</span>
                   </div>
                 )}
                 {listing.area_m2 && (
-                  <div className=\"flex items-center gap-2\">
-                    <Square className=\"h-4 w-4 text-muted-foreground\" />
+                  <div className="flex items-center gap-2">
+                    <Square className="h-4 w-4 text-muted-foreground" />
                     <span>{formatArea(listing.area_m2)}</span>
                   </div>
                 )}
                 {listing.year_built && (
-                  <div className=\"flex items-center gap-2\">
-                    <Clock className=\"h-4 w-4 text-muted-foreground\" />
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
                     <span>Construit en {listing.year_built}</span>
                   </div>
                 )}
@@ -278,10 +278,10 @@ export default function ListingDetailPage() {
               
               {listing.description && (
                 <>
-                  <Separator className=\"my-6\" />
+                  <Separator className="my-6" />
                   <div>
-                    <h3 className=\"font-semibold mb-3\">Description</h3>
-                    <p className=\"text-muted-foreground whitespace-pre-wrap\">{listing.description}</p>
+                    <h3 className="font-semibold mb-3">Description</h3>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{listing.description}</p>
                   </div>
                 </>
               )}
@@ -298,51 +298,51 @@ export default function ListingDetailPage() {
         </div>
 
         {/* Sidebar */}
-        <div className=\"space-y-6\">
+        <div className="space-y-6">
           {/* Contact Card */}
           <Card>
             <CardHeader>
-              <CardTitle className=\"flex items-center gap-2\">
-                <Phone className=\"h-5 w-5\" />
+              <CardTitle className="flex items-center gap-2">
+                <Phone className="h-5 w-5" />
                 Contact
               </CardTitle>
             </CardHeader>
-            <CardContent className=\"space-y-4\">
+            <CardContent className="space-y-4">
               <Input
-                placeholder=\"Votre nom\"
+                placeholder="Votre nom"
                 value={contactName}
                 onChange={(e) => setContactName(e.target.value)}
               />
               <Input
-                placeholder=\"Votre email\"
-                type=\"email\"
+                placeholder="Votre email"
+                type="email"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
               />
               <Input
-                placeholder=\"Votre téléphone\"
-                type=\"tel\"
+                placeholder="Votre téléphone"
+                type="tel"
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
               />
               <Textarea
-                placeholder=\"Votre message\"
+                placeholder="Votre message"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               />
               
-              <div className=\"flex flex-col gap-2\">
+              <div className="flex flex-col gap-2">
                 <Button 
                   onClick={handleVisitRequest}
                   disabled={!contactEmail}
-                  className=\"w-full\"
+                  className="w-full"
                 >
-                  <Calendar className=\"h-4 w-4 mr-2\" />
+                  <Calendar className="h-4 w-4 mr-2" />
                   Demander une visite
                 </Button>
                 
-                <div className=\"flex items-center gap-2 text-sm text-muted-foreground\">
-                  <Phone className=\"h-3 w-3\" />
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Phone className="h-3 w-3" />
                   <span>{process.env.COMPANY_PHONE || '+216 XX XXX XXX'}</span>
                 </div>
               </div>
@@ -353,12 +353,12 @@ export default function ListingDetailPage() {
           {isForRent && (
             <Card>
               <CardHeader>
-                <CardTitle className=\"flex items-center gap-2\">
-                  <Calendar className=\"h-5 w-5\" />
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
                   Réserver
                 </CardTitle>
               </CardHeader>
-              <CardContent className=\"space-y-4\">
+              <CardContent className="space-y-4">
                 <DateRangePicker
                   startDate={startDate}
                   endDate={endDate}
@@ -368,9 +368,9 @@ export default function ListingDetailPage() {
                 />
                 
                 {startDate && endDate && (
-                  <div className=\"p-3 bg-gray-50 rounded-lg\">
-                    <p className=\"text-sm font-medium\">Période sélectionnée:</p>
-                    <p className=\"text-sm text-muted-foreground\">
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm font-medium">Période sélectionnée:</p>
+                    <p className="text-sm text-muted-foreground">
                       Du {formatDate(startDate)} au {formatDate(endDate)}
                     </p>
                   </div>
@@ -379,12 +379,12 @@ export default function ListingDetailPage() {
                 <Button 
                   onClick={handleBookingSubmit}
                   disabled={!startDate || !endDate || !contactEmail || isSubmitting}
-                  className=\"w-full\"
+                  className="w-full"
                 >
                   {isSubmitting ? 'Envoi...' : 'Demander une réservation'}
                 </Button>
                 
-                <p className=\"text-xs text-muted-foreground\">
+                <p className="text-xs text-muted-foreground">
                   Votre demande sera traitée dans les plus brefs délais.
                 </p>
               </CardContent>

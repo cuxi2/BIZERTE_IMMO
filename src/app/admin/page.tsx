@@ -24,7 +24,7 @@ export default function AdminDashboard() {
     upcomingVisits: 0,
     totalRevenue: 0
   })
-  const [recentListings, setRecentListings] = useState<any[]>([])
+  const [recentListings, setRecentListings] = useState<Database['public']['Tables']['listings']['Row'][]>([]))
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

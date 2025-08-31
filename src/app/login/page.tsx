@@ -59,11 +59,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className=\"min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4\">
-      <div className=\"w-full max-w-md\">
-        <div className=\"text-center mb-8\">
-          <h1 className=\"text-3xl font-bold text-gray-900\">MEFTAHI IMMO</h1>
-          <p className=\"text-gray-600 mt-2\">Espace Administration</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">MEFTAHI IMMO</h1>
+          <p className="text-gray-600 mt-2">Espace Administration</p>
         </div>
 
         <Card>
@@ -75,20 +75,20 @@ export default function LoginPage() {
           </CardHeader>
           
           <CardContent>
-            <form onSubmit={handleSubmit} className=\"space-y-4\">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <Alert variant=\"destructive\">
-                  <AlertCircle className=\"h-4 w-4\" />
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
-              <div className=\"space-y-2\">
-                <Label htmlFor=\"email\">Email</Label>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id=\"email\"
-                  type=\"email\"
-                  placeholder=\"admin@meftahi-immo.tn\"
+                  id="email"
+                  type="email"
+                  placeholder="admin@meftahi-immo.tn"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -96,12 +96,12 @@ export default function LoginPage() {
                 />
               </div>
 
-              <div className=\"space-y-2\">
-                <Label htmlFor=\"password\">Mot de passe</Label>
+              <div className="space-y-2">
+                <Label htmlFor="password">Mot de passe</Label>
                 <Input
-                  id=\"password\"
-                  type=\"password\"
-                  placeholder=\"••••••••\"
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -110,19 +110,19 @@ export default function LoginPage() {
               </div>
 
               <Button 
-                type=\"submit\" 
-                className=\"w-full\" 
+                type="submit" 
+                className="w-full" 
                 disabled={loading}
               >
-                {loading && <Loader2 className=\"mr-2 h-4 w-4 animate-spin\" />}
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Se connecter
               </Button>
             </form>
 
-            <div className=\"mt-6 text-center\">
+            <div className="mt-6 text-center">
               <Link 
-                href=\"/\" 
-                className=\"text-sm text-muted-foreground hover:text-primary\"
+                href="/" 
+                className="text-sm text-muted-foreground hover:text-primary"
               >
                 ← Retour au site
               </Link>
@@ -130,7 +130,7 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        <div className=\"mt-8 text-center text-sm text-gray-500\">
+        <div className="mt-8 text-center text-sm text-gray-500">
           <p>Accès réservé aux administrateurs autorisés</p>
         </div>
       </div>

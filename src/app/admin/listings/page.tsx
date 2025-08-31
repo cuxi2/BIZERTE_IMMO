@@ -28,7 +28,7 @@ export default function AdminListingsPage() {
   const fetchListings = async () => {
     setLoading(true)
     try {
-      let query = supabase
+      const query = supabase
         .from('listings')
         .select('*')
         .order('created_at', { ascending: false })
@@ -78,7 +78,7 @@ export default function AdminListingsPage() {
 
       toast.success('Statut mis à jour')
       setListings(prev => 
-        prev.map(l => l.id === id ? { ...l, status: newStatus as any } : l)
+        prev.map(l => l.id === id ? { ...l, status: newStatus as string } : l)
       )
     } catch (error) {
       toast.error('Erreur lors de la mise à jour')

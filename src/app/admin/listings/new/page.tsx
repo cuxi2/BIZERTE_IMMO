@@ -34,7 +34,7 @@ export default function NewListingPage() {
     status: 'brouillon'
   })
 
-  const handleInputChange = (field: keyof CreateListingData, value: any) => {
+  const handleInputChange = (field: keyof CreateListingData, value: string | number | undefined) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
