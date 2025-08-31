@@ -37,11 +37,19 @@ export default function LoginPage() {
 
       // Check if user has admin role
       if (data.user) {
-        const { data: profile } = await supabase
+        console.log('User ID:', data.user.id);
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', data.user.id)
           .single()
+
+        console.log('Profile data:', profile);
+        console.log('Profile error:', profileError);
+
+        if (profileError) {
+          console.error('Profile query error:', profileError);
+        }
 
         if (profile?.role === 'admin') {
           toast.success('Connexion réussie')
