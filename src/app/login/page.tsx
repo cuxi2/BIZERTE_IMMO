@@ -25,52 +25,84 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // Sign in the user
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
-      if (error) {
-        setError(error.message)
+      if (signInError) {
+        setError(signInError.message)
+        setLoading(false)
         return
       }
 
-      // Check if user has admin role
       if (data.user) {
-        // First try to get the profile
+        // Small delay to ensure session is established
+        await new Promise(resolve => setTimeout(resolve, 300))
+        
+        // Try to get the user's profile
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('role')
+          .select('id, full_name, role')
           .eq('id', data.user.id)
           .single()
 
-        // If profile doesn't exist, create it (this shouldn't happen but let's be safe)
+        // If profile doesn't exist, create it
         if (profileError && profileError.code === 'PGRST116') {
+          console.log('Profile not found, creating one...')
+          
+          // Get user metadata from auth
+          const fullName = data.user.user_metadata?.full_name || email.split('@')[0]
+          const phone = data.user.user_metadata?.phone || ''
+          
+          // Try to insert profile, handle conflicts
           const { error: insertError } = await supabase
             .from('profiles')
-            .insert({
+            .upsert({
               id: data.user.id,
-              full_name: 'Admin User',
-              phone: '+21350029128',
-              role: 'admin'
+              full_name: fullName,
+              phone: phone,
+              role: 'admin' // Default to admin for self-hosted version
+            }, {
+              onConflict: 'id'
             })
           
           if (insertError) {
-            setError('Une erreur est survenue lors de la création du profil')
+            console.error('Error creating profile:', insertError)
+            setError('Une erreur est survenue lors de la création du profil: ' + insertError.message)
             await supabase.auth.signOut()
+            setLoading(false)
             return
           }
           
-          // Profile created, proceed as admin
-          toast.success('Connexion réussie')
-          router.push('/admin')
+          // Try to get profile again
+          const { data: newProfile, error: newProfileError } = await supabase
+            .from('profiles')
+            .select('id, full_name, role')
+            .eq('id', data.user.id)
+            .single()
+            
+          if (newProfileError) {
+            setError('Une erreur est survenue lors de la vérification du profil: ' + newProfileError.message)
+            await supabase.auth.signOut()
+            setLoading(false)
+            return
+          }
+          
+          // Check if user has admin role
+          if (newProfile && newProfile.role === 'admin') {
+            toast.success('Connexion réussie')
+            router.push('/admin')
+          } else {
+            await supabase.auth.signOut()
+            setError('Accès non autorisé. Seuls les administrateurs peuvent se connecter.')
+          }
           return
-        }
-
-        // If there's another error, show it
-        if (profileError) {
-          setError('Une erreur est survenue lors de la vérification du profil')
+        } else if (profileError) {
+          setError('Une erreur est survenue lors de la vérification du profil: ' + profileError.message)
           await supabase.auth.signOut()
+          setLoading(false)
           return
         }
 
@@ -84,7 +116,8 @@ export default function LoginPage() {
         }
       }
     } catch (err) {
-      setError('Une erreur est survenue lors de la connexion')
+      console.error('Unexpected error:', err)
+      setError('Une erreur est survenue lors de la connexion: ' + (err as Error).message)
     } finally {
       setLoading(false)
     }

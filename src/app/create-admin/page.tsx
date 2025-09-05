@@ -2,21 +2,19 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, AlertCircle } from 'lucide-react'
+import { Loader2, AlertCircle, CheckCircle } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
-import { toast } from 'sonner'
 
-export default function RegisterPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [phone, setPhone] = useState('')
+export default function CreateAdminPage() {
+  const [email, setEmail] = useState('admin@meftahi-immo.tn')
+  const [password, setPassword] = useState('SecurePass123!')
+  const [fullName, setFullName] = useState('Admin User')
+  const [phone, setPhone] = useState('+216XXXXXXXX')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -29,15 +27,14 @@ export default function RegisterPage() {
     setSuccess(false)
 
     try {
-      // Sign up the user
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      // Create the user with admin privileges
+      const { data, error: signUpError } = await supabase.auth.admin.createUser({
         email,
         password,
-        options: {
-          data: {
-            full_name: fullName,
-            phone: phone
-          }
+        email_confirm: true, // Skip email confirmation
+        user_metadata: {
+          full_name: fullName,
+          phone: phone
         }
       })
 
@@ -47,33 +44,27 @@ export default function RegisterPage() {
       }
 
       if (data.user) {
-        // Try to create profile immediately
+        // Create profile with admin role
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
             id: data.user.id,
             full_name: fullName,
             phone: phone,
-            role: 'admin' // First user gets admin role
+            role: 'admin'
           }, {
             onConflict: 'id'
           })
 
         if (profileError) {
-          console.error('Profile creation error:', profileError)
-          // Don't fail the registration if profile creation fails, as the trigger should handle it
+          setError('Error creating profile: ' + profileError.message)
+          return
         }
 
         setSuccess(true)
-        toast.success('Compte créé avec succès! Veuillez vérifier votre email.')
-        
-        // Redirect to login after a short delay
-        setTimeout(() => {
-          router.push('/login')
-        }, 3000)
       }
     } catch (err) {
-      setError('Une erreur est survenue lors de la création du compte: ' + (err as Error).message)
+      setError('An unexpected error occurred: ' + (err as Error).message)
     } finally {
       setLoading(false)
     }
@@ -84,27 +75,34 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">MEFTAHI IMMO</h1>
-          <p className="text-gray-600 mt-2">Création de compte administrateur</p>
+          <p className="text-gray-600 mt-2">Create Admin Account</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Créer un compte</CardTitle>
+            <CardTitle>Create Admin Account</CardTitle>
             <CardDescription>
-              Créez votre compte administrateur
+              Set up the initial administrator account
             </CardDescription>
           </CardHeader>
           
           <CardContent>
             {success ? (
               <div className="text-center py-4">
-                <p className="text-green-600 mb-4">Compte créé avec succès!</p>
+                <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                <p className="text-green-600 mb-4">Admin account created successfully!</p>
                 <p className="text-sm text-muted-foreground">
-                  Veuillez vérifier votre email et vous connecter.
+                  Email: {email}
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Vous allez être redirigé vers la page de connexion...
+                  You can now log in to the admin panel.
                 </p>
+                <Button 
+                  onClick={() => router.push('/login')} 
+                  className="w-full mt-6"
+                >
+                  Go to Login
+                </Button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -116,11 +114,11 @@ export default function RegisterPage() {
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Nom complet</Label>
+                  <Label htmlFor="fullName">Full Name</Label>
                   <Input
                     id="fullName"
                     type="text"
-                    placeholder="Votre nom complet"
+                    placeholder="Admin User"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     required
@@ -129,11 +127,11 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Téléphone</Label>
+                  <Label htmlFor="phone">Phone</Label>
                   <Input
                     id="phone"
                     type="tel"
-                    placeholder="Numéro de téléphone"
+                    placeholder="+216XXXXXXXX"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     required
@@ -155,11 +153,11 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
+                  <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder="SecurePass123!"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -174,24 +172,25 @@ export default function RegisterPage() {
                   disabled={loading}
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Créer le compte
+                  Create Admin Account
                 </Button>
               </form>
             )}
 
             <div className="mt-6 text-center">
-              <Link 
-                href="/login" 
-                className="text-sm text-muted-foreground hover:text-primary"
+              <Button 
+                variant="outline"
+                onClick={() => router.push('/')} 
+                className="text-sm"
               >
-                ← Retour à la connexion
-              </Link>
+                ← Back to Home
+              </Button>
             </div>
           </CardContent>
         </Card>
 
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Accès réservé aux administrateurs autorisés</p>
+          <p>For administrator use only</p>
         </div>
       </div>
     </div>

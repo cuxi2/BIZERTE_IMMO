@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Setup - MEFTAHI IMMO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0070f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #0051cc;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #0070f3;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .instructions {
+            background-color: #e9ecef;
+            border-left: 4px solid #0070f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .results {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .action-buttons button {
+            flex: 1;
+        }
+        .action-buttons button:last-child {
+            background-color: #28a745;
+        }
+        .action-buttons button:last-child:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MEFTAHI IMMO</h1>
+        <p class="subtitle">Database Setup Verification</p>
+        
+        <div class="instructions">
+            <h3>Current Setup:</h3>
+            <ul>
+                <li>✅ Supabase Project: https://pvfzwnieerksnfusyidy.supabase.co</li>
+                <li>✅ Environment Variables: Configured</li>
+                <li>✅ Storage Bucket: listings-media (Public)</li>
+                <li>❓ Database Tables: Checking...</li>
+            </ul>
+        </div>
+        
+        <div id="message"></div>
+        <div id="results" class="results" style="display: none;"></div>
+        
+        <button type="button" id="checkBtn">
+            <span id="buttonText">Check Database Setup</span>
+        </button>
+        
+        <div class="action-buttons">
+            <button type="button" id="setupBtn">
+                Run Database Setup
+            </button>
+            <button type="button" id="startBtn">
+                Start Application
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(
+            'https://pvfzwnieerksnfusyidy.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2Znp3bmllZXJrc25mdXN5aWR5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzA3MTE3NywiZXhwIjoyMDcyNjQ3MTc3fQ.cq4W6tiZZdINnVu3OpsP0jxtvtnLlJwQob82LLt_O-g'
+        );
+        
+        const checkBtn = document.getElementById('checkBtn');
+        const setupBtn = document.getElementById('setupBtn');
+        const startBtn = document.getElementById('startBtn');
+        const buttonText = document.getElementById('buttonText');
+        const messageDiv = document.getElementById('message');
+        const resultsDiv = document.getElementById('results');
+        
+        function addResult(text) {
+            const resultElement = document.createElement('div');
+            resultElement.textContent = text;
+            resultsDiv.appendChild(resultElement);
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+        
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+            resultsDiv.style.display = 'none';
+        }
+        
+        async function checkDatabaseSetup() {
+            // Disable button and show loading
+            checkBtn.disabled = true;
+            buttonText.innerHTML = '<span class="spinner"></span> Checking...';
+            messageDiv.innerHTML = '';
+            clearResults();
+            
+            try {
+                addResult('🔍 Starting database verification...');
+                
+                // Check profiles table
+                addResult('1. Checking profiles table...');
+                try {
+                    const { data, error } = await supabase
+                        .from('profiles')
+                        .select('id')
+                        .limit(1);
+                    
+                    if (error) {
+                        if (error.message.includes('relation "profiles" does not exist')) {
+                            addResult('  ❌ Profiles table does not exist');
+                            throw new Error('Run database setup to create tables');
+                        } else {
+                            throw error;
+                        }
+                    } else {
+                        addResult('  ✅ Profiles table exists');
+                    }
+                } catch (e) {
+                    if (e.message.includes('relation "profiles" does not exist')) {
+                        addResult('  ❌ Profiles table does not exist');
+                    } else {
+                        throw e;
+                    }
+                }
+                
+                // Check listings table
+                addResult('2. Checking listings table...');
+                try {
+                    const { data, error } = await supabase
+                        .from('listings')
+                        .select('id')
+                        .limit(1);
+                    
+                    if (error) {
+                        if (error.message.includes('relation "listings" does not exist')) {
+                            addResult('  ❌ Listings table does not exist');
+                            throw new Error('Run database setup to create tables');
+                        } else {
+                            throw error;
+                        }
+                    } else {
+                        addResult('  ✅ Listings table exists');
+                    }
+                } catch (e) {
+                    if (e.message.includes('relation "listings" does not exist')) {
+                        addResult('  ❌ Listings table does not exist');
+                    } else {
+                        throw e;
+                    }
+                }
+                
+                // Check listing_media table
+                addResult('3. Checking listing_media table...');
+                try {
+                    const { data, error } = await supabase
+                        .from('listing_media')
+                        .select('id')
+                        .limit(1);
+                    
+                    if (error) {
+                        if (error.message.includes('relation "listing_media" does not exist')) {
+                            addResult('  ❌ Listing_media table does not exist');
+                            throw new Error('Run database setup to create tables');
+                        } else {
+                            throw error;
+                        }
+                    } else {
+                        addResult('  ✅ Listing_media table exists');
+                    }
+                } catch (e) {
+                    if (e.message.includes('relation "listing_media" does not exist')) {
+                        addResult('  ❌ Listing_media table does not exist');
+                    } else {
+                        throw e;
+                    }
+                }
+                
+                // Check reservations table
+                addResult('4. Checking reservations table...');
+                try {
+                    const { data, error } = await supabase
+                        .from('reservations')
+                        .select('id')
+                        .limit(1);
+                    
+                    if (error) {
+                        if (error.message.includes('relation "reservations" does not exist')) {
+                            addResult('  ❌ Reservations table does not exist');
+                            throw new Error('Run database setup to create tables');
+                        } else {
+                            throw error;
+                        }
+                    } else {
+                        addResult('  ✅ Reservations table exists');
+                    }
+                } catch (e) {
+                    if (e.message.includes('relation "reservations" does not exist')) {
+                        addResult('  ❌ Reservations table does not exist');
+                    } else {
+                        throw e;
+                    }
+                }
+                
+                // Check visits table
+                addResult('5. Checking visits table...');
+                try {
+                    const { data, error } = await supabase
+                        .from('visits')
+                        .select('id')
+                        .limit(1);
+                    
+                    if (error) {
+                        if (error.message.includes('relation "visits" does not exist')) {
+                            addResult('  ❌ Visits table does not exist');
+                            throw new Error('Run database setup to create tables');
+                        } else {
+                            throw error;
+                        }
+                    } else {
+                        addResult('  ✅ Visits table exists');
+                    }
+                } catch (e) {
+                    if (e.message.includes('relation "visits" does not exist')) {
+                        addResult('  ❌ Visits table does not exist');
+                    } else {
+                        throw e;
+                    }
+                }
+                
+                addResult('🎉 Database verification complete!');
+                messageDiv.innerHTML = '<div class="message success"><strong>✅ Success!</strong><br>All database tables exist. You\'re ready to start your application!</div>';
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="message error"><strong>❌ Error:</strong><br>${error.message}</div>`;
+                addResult(`❌ Error: ${error.message}`);
+            } finally {
+                // Re-enable button
+                checkBtn.disabled = false;
+                buttonText.textContent = 'Check Database Setup';
+            }
+        }
+        
+        // Event listeners
+        checkBtn.addEventListener('click', checkDatabaseSetup);
+        setupBtn.addEventListener('click', function() {
+            window.open('setup-new-db.bat', '_blank');
+        });
+        startBtn.addEventListener('click', function() {
+            window.open('http://localhost:3000', '_blank');
+        });
+        
+        // Run check automatically when page loads
+        window.addEventListener('load', function() {
+            setTimeout(checkDatabaseSetup, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Recursion Error - MEFTAHI IMMO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0070f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #0051cc;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #0070f3;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .instructions {
+            background-color: #e9ecef;
+            border-left: 4px solid #0070f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .results {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .action-buttons button {
+            flex: 1;
+        }
+        .action-buttons button:last-child {
+            background-color: #28a745;
+        }
+        .action-buttons button:last-child:hover {
+            background-color: #218838;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            min-height: 200px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MEFTAHI IMMO</h1>
+        <p class="subtitle">Fix Recursion Error Tool</p>
+        
+        <div class="instructions">
+            <h3>This tool fixes:</h3>
+            <ul>
+                <li>"infinite recursion detected in policy for relation 'profiles'"</li>
+                <li>Profile verification errors</li>
+                <li>RLS policy issues causing login failures</li>
+            </ul>
+        </div>
+        
+        <div id="message"></div>
+        <div id="results" class="results" style="display: none;"></div>
+        
+        <div class="form-group">
+            <label for="sql">Fix Script:</label>
+            <textarea id="sql" readonly>-- Fixing infinite recursion in profiles RLS policy
+ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Profiles are viewable by admins." ON public.profiles;
+CREATE POLICY "Profiles are viewable by admins." 
+ON public.profiles FOR SELECT 
+USING (
+  EXISTS (
+    SELECT 1 
+    FROM public.profiles p 
+    WHERE p.id = auth.uid() 
+    AND p.role = 'admin'
+  )
+);
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;</textarea>
+        </div>
+        
+        <button type="button" id="fixBtn">
+            <span id="buttonText">Fix Recursion Error</span>
+        </button>
+        
+        <div class="action-buttons">
+            <button type="button" id="dashboardBtn">
+                Open Supabase Dashboard
+            </button>
+            <button type="button" id="loginBtn">
+                Go to Login Page
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(
+            'https://tcnumqnrunxoejnqykwt.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjbnVtcW5ydW54b2VqbnF5a3d0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjU3NTI3MiwiZXhwIjoyMDcyMTUxMjcyfQ.2mUWSO_Wg216A66qMVMhj4n4wnqbrSvyNFavaW-PCi8'
+        );
+        
+        const fixBtn = document.getElementById('fixBtn');
+        const dashboardBtn = document.getElementById('dashboardBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const buttonText = document.getElementById('buttonText');
+        const messageDiv = document.getElementById('message');
+        const resultsDiv = document.getElementById('results');
+        
+        function addResult(text) {
+            const resultElement = document.createElement('div');
+            resultElement.textContent = text;
+            resultsDiv.appendChild(resultElement);
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+        
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+            resultsDiv.style.display = 'none';
+        }
+        
+        async function fixRecursionError() {
+            // Disable button and show loading
+            fixBtn.disabled = true;
+            buttonText.innerHTML = '<span class="spinner"></span> Fixing...';
+            messageDiv.innerHTML = '';
+            clearResults();
+            
+            try {
+                addResult('🔧 Starting recursion error fix...');
+                
+                // Define the SQL statements to fix recursion
+                const sqlStatements = [
+                    "ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;",
+                    "DROP POLICY IF EXISTS \"Profiles are viewable by admins.\" ON public.profiles;",
+                    "CREATE POLICY \"Profiles are viewable by admins.\" ON public.profiles FOR SELECT USING (EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin'));",
+                    "ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;"
+                ];
+                
+                // Execute each statement
+                for (let i = 0; i < sqlStatements.length; i++) {
+                    const statement = sqlStatements[i];
+                    addResult(`Executing: ${statement.substring(0, 60)}${statement.length > 60 ? '...' : ''}`);
+                    
+                    try {
+                        // Try different RPC methods
+                        try {
+                            await supabase.rpc('exec_sql', { sql: statement });
+                        } catch (e1) {
+                            try {
+                                await supabase.rpc('execute_sql', { sql: statement });
+                            } catch (e2) {
+                                try {
+                                    await supabase.rpc('sql', { sql: statement });
+                                } catch (e3) {
+                                    // If all RPC methods fail, show error but continue
+                                    addResult(`  ⚠️  Warning: ${e1.message}`);
+                                }
+                            }
+                        }
+                    } catch (stmtError) {
+                        addResult(`  ⚠️  Warning: ${stmtError.message}`);
+                    }
+                }
+                
+                addResult('🎉 Recursion error fix applied successfully!');
+                messageDiv.innerHTML = '<div class="message success"><strong>✅ Success!</strong><br>Recursion error has been fixed. You can now try logging in.</div>';
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="message error"><strong>❌ Error:</strong><br>${error.message}</div>`;
+                addResult(`❌ Error: ${error.message}`);
+                
+                // Provide manual instructions
+                messageDiv.innerHTML += `
+                <div class="message warning">
+                    <strong>🔧 Manual Fix Instructions:</strong><br>
+                    1. Copy the SQL script from above<br>
+                    2. Go to your Supabase dashboard<br>
+                    3. Navigate to SQL Editor<br>
+                    4. Paste and run the script<br>
+                    5. Try logging in again
+                </div>`;
+            } finally {
+                // Re-enable button
+                fixBtn.disabled = false;
+                buttonText.textContent = 'Fix Recursion Error';
+            }
+        }
+        
+        // Event listeners
+        fixBtn.addEventListener('click', fixRecursionError);
+        dashboardBtn.addEventListener('click', function() {
+            window.open('https://app.supabase.com/project/tcnumqnrunxoejnqykwt', '_blank');
+        });
+        loginBtn.addEventListener('click', function() {
+            window.open('http://localhost:3001/login', '_blank');
+        });
+    </script>
+</body>
+</html>

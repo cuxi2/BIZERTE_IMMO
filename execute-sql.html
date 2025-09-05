@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Execute SQL - MEFTAHI IMMO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            min-height: 300px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0070f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        button:hover {
+            background-color: #0051cc;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #0070f3;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .instructions {
+            background-color: #e9ecef;
+            border-left: 4px solid #0070f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .credentials {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MEFTAHI IMMO</h1>
+        <p class="subtitle">Execute SQL Script to Create Admin User</p>
+        
+        <div class="credentials">
+            <h3>Admin Credentials (After Execution):</h3>
+            <p><strong>Email:</strong> admin@meftahi-immo.tn</p>
+            <p><strong>Password:</strong> SecurePass123!</p>
+        </div>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Copy the SQL script below</li>
+                <li>Go to your Supabase dashboard</li>
+                <li>Navigate to SQL Editor</li>
+                <li>Paste and run the script</li>
+                <li>Log in at <a href="http://localhost:3001/login" target="_blank">http://localhost:3001/login</a></li>
+            </ol>
+        </div>
+        
+        <div id="message"></div>
+        
+        <form id="sqlForm">
+            <div class="form-group">
+                <label for="sql">SQL Script to Create Admin User:</label>
+                <textarea id="sql" readonly>DO $$
+DECLARE
+  new_user_id uuid;
+BEGIN
+  -- 1. Créer l'utilisateur dans auth.users
+  INSERT INTO auth.users (
+    id, email, encrypted_password, email_confirmed_at,
+    raw_app_meta_data, raw_user_meta_data,
+    created_at, updated_at, aud, role
+  )
+  VALUES (
+    gen_random_uuid(),
+    'admin@meftahi-immo.tn', -- Email de l'administrateur
+    crypt('SecurePass123!', gen_salt('bf')), -- Mot de passe sécurisé
+    NOW(),
+    '{"provider":"email","providers":["email"]}',
+    '{"full_name": "Admin User", "phone": "+216XXXXXXXX", "email_verified": true}',
+    NOW(),
+    NOW(),
+    'authenticated',
+    'authenticated'
+  )
+  RETURNING id INTO new_user_id;
+
+  -- 2. Créer le profil admin lié
+  INSERT INTO public.profiles (
+    id, full_name, phone, role, created_at
+  )
+  VALUES (
+    new_user_id,
+    'Admin User', -- Nom affiché
+    '+216XXXXXXXX', -- Numéro de téléphone
+    'admin', -- Rôle administrateur
+    NOW()
+  );
+  
+  RAISE NOTICE '✅ Admin user created successfully with ID: %', new_user_id;
+  RAISE NOTICE '📧 Email: admin@meftahi-immo.tn';
+  RAISE NOTICE '🔑 Password: SecurePass123!';
+  RAISE NOTICE '🚀 You can now log in at http://localhost:3001/login';
+  
+EXCEPTION
+  WHEN unique_violation THEN
+    RAISE NOTICE '⚠️ User already exists. Updating existing profile to admin...';
+    -- Si l'utilisateur existe déjà, mettre à jour son profil
+    UPDATE public.profiles 
+    SET role = 'admin', full_name = 'Admin User', phone = '+216XXXXXXXX'
+    WHERE id = (
+      SELECT id FROM auth.users WHERE email = 'admin@meftahi-immo.tn' LIMIT 1
+    );
+    RAISE NOTICE '✅ Profile updated to admin role';
+    
+  WHEN OTHERS THEN
+    RAISE EXCEPTION '❌ Error creating admin user: %', SQLERRM;
+END $$;</textarea>
+            </div>
+            
+            <div class="form-group">
+                <button type="button" id="copyBtn">
+                    Copy SQL to Clipboard
+                </button>
+            </div>
+            
+            <div class="form-group">
+                <button type="button" id="dashboardBtn">
+                    Open Supabase Dashboard
+                </button>
+            </div>
+        </form>
+        
+        <div class="instructions">
+            <h3>After Executing the SQL:</h3>
+            <p>You can log in at: <a href="http://localhost:3001/login" target="_blank">http://localhost:3001/login</a></p>
+            <p><strong>Email:</strong> admin@meftahi-immo.tn</p>
+            <p><strong>Password:</strong> SecurePass123!</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            const sqlText = document.getElementById('sql').value;
+            navigator.clipboard.writeText(sqlText).then(function() {
+                const originalText = document.getElementById('copyBtn').textContent;
+                document.getElementById('copyBtn').textContent = 'Copied!';
+                setTimeout(function() {
+                    document.getElementById('copyBtn').textContent = originalText;
+                }, 2000);
+            });
+        });
+        
+        document.getElementById('dashboardBtn').addEventListener('click', function() {
+            // Replace with your actual Supabase project URL
+            const supabaseUrl = 'https://tcnumqnrunxoejnqykwt.supabase.co';
+            const dashboardUrl = supabaseUrl.replace('https://', 'https://app.supabase.com/project/').replace('.supabase.co', '');
+            window.open(dashboardUrl, '_blank');
+        });
+    </script>
+</body>
+</html>

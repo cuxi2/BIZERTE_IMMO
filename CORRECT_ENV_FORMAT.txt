@@ -1,0 +1,15 @@
+# CORRECT SUPABASE ENVIRONMENT VARIABLES FORMAT
+
+# These should be your Supabase project URL (NOT postgresql:// connection string)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+
+# This is your Supabase anon key (for client-side usage)
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
+# This is your Supabase service role key (for server-side operations)
+SUPABASE_SERVICE_ROLE=your-service-role-key-here
+
+# Example of correct format:
+# NEXT_PUBLIC_SUPABASE_URL=https://pvfzwnieerksnfusyidy.supabase.co
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2Znp3bmllZXJrc25mdXN5aWR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNzExNzcsImV4cCI6MjA3MjY0NzE3N30.zVaKCGZUiFJHf3H3SqEJrA6CKcwpgU2MW0E5B7qxzmA
+# SUPABASE_SERVICE_ROLE=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2Znp3bmllZXJrc25mdXN5aWR5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzA3MTE3NywiZXhwIjoyMDcyNjQ3MTc3fQ.cq4W6tiZZdINnVu3OpsP0jxtvtnLlJwQob82LLt_O-g

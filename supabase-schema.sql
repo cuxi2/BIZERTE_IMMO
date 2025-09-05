@@ -170,26 +170,29 @@ create policy "Profiles: update self" on public.profiles
   for update using (auth.uid() = id);
 
 create policy "Profiles: admin read all" on public.profiles
-  for select using (exists(
-    select 1 from public.profiles p 
-    where p.id = auth.uid() and p.role = 'admin'
-  ));
+  for select using (
+    auth.uid() in (
+      select id from public.profiles where role = 'admin'
+    )
+  );
 
 -- Listings policies
 create policy "Listings: public read published" on public.listings
   for select using (status = 'publie');
 
 create policy "Listings: admin read all" on public.listings
-  for select using (exists(
-    select 1 from public.profiles p 
-    where p.id = auth.uid() and p.role = 'admin'
-  ));
+  for select using (
+    auth.uid() in (
+      select id from public.profiles where role = 'admin'
+    )
+  );
 
 create policy "Listings: admin write" on public.listings
-  for all using (exists(
-    select 1 from public.profiles p 
-    where p.id = auth.uid() and p.role = 'admin'
-  ));
+  for all using (
+    auth.uid() in (
+      select id from public.profiles where role = 'admin'
+    )
+  );
 
 -- Media policies
 create policy "Media: public read" on public.listing_media 
@@ -199,16 +202,18 @@ create policy "Media: public read" on public.listing_media
   ));
 
 create policy "Media: admin read all" on public.listing_media 
-  for select using (exists(
-    select 1 from public.profiles p 
-    where p.id = auth.uid() and p.role = 'admin'
-  ));
+  for select using (
+    auth.uid() in (
+      select id from public.profiles where role = 'admin'
+    )
+  );
 
 create policy "Media: admin write" on public.listing_media 
-  for all using (exists(
-    select 1 from public.profiles p 
-    where p.id = auth.uid() and p.role = 'admin'
-  ));
+  for all using (
+    auth.uid() in (
+      select id from public.profiles where role = 'admin'
+    )
+  );
 
 -- Reservations policies
 create policy "Reservations: public read by listing" on public.reservations
@@ -218,10 +223,11 @@ create policy "Reservations: create by auth users" on public.reservations
   for insert with check (auth.uid() is not null or auth.uid() is null);
 
 create policy "Reservations: manage by admin" on public.reservations
-  for all using (exists(
-    select 1 from public.profiles p 
-    where p.id = auth.uid() and p.role = 'admin'
-  ));
+  for all using (
+    auth.uid() in (
+      select id from public.profiles where role = 'admin'
+    )
+  );
 
 create policy "Reservations: users read own" on public.reservations
   for select using (auth.uid() = user_id);
@@ -234,10 +240,11 @@ create policy "Visits: create by auth users" on public.visits
   for insert with check (auth.uid() is not null or auth.uid() is null);
 
 create policy "Visits: manage by admin" on public.visits
-  for all using (exists(
-    select 1 from public.profiles p 
-    where p.id = auth.uid() and p.role = 'admin'
-  ));
+  for all using (
+    auth.uid() in (
+      select id from public.profiles where role = 'admin'
+    )
+  );
 
 create policy "Visits: users read own" on public.visits
   for select using (auth.uid() = user_id);
@@ -267,9 +274,8 @@ create policy "Listings Media: Admin Upload"
 on storage.objects for insert
 with check (
   bucket_id = 'listings-media' 
-  and exists(
-    select 1 from public.profiles p 
-    where p.id = auth.uid() and p.role = 'admin'
+  and auth.uid() in (
+    select id from public.profiles where role = 'admin'
   )
 );
 
@@ -277,9 +283,8 @@ create policy "Listings Media: Admin Delete"
 on storage.objects for delete
 using (
   bucket_id = 'listings-media' 
-  and exists(
-    select 1 from public.profiles p 
-    where p.id = auth.uid() and p.role = 'admin'
+  and auth.uid() in (
+    select id from public.profiles where role = 'admin'
   )
 );
 
@@ -291,16 +296,26 @@ using (
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, full_name, phone, role)
-  values (
-    new.id, 
-    new.raw_user_meta_data->>'full_name', 
-    new.raw_user_meta_data->>'phone',
-    case 
-      when (select count(*) from auth.users) = 1 then 'admin'
-      else 'client'
-    end
-  );
+  -- Check if this is the first user
+  if (select count(*) from public.profiles) = 0 then
+    -- First user gets admin role
+    insert into public.profiles (id, full_name, phone, role)
+    values (
+      new.id, 
+      new.raw_user_meta_data->>'full_name', 
+      new.raw_user_meta_data->>'phone',
+      'admin'
+    );
+  else
+    -- Subsequent users get client role by default
+    insert into public.profiles (id, full_name, phone, role)
+    values (
+      new.id, 
+      new.raw_user_meta_data->>'full_name', 
+      new.raw_user_meta_data->>'phone',
+      'client'
+    );
+  end if;
   return new;
 end;
 $$ language plpgsql security definer;

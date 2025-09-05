@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnose Profile - MEFTAHI IMMO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0070f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #0051cc;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #0070f3;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .instructions {
+            background-color: #e9ecef;
+            border-left: 4px solid #0070f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .results {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .action-buttons button {
+            flex: 1;
+        }
+        .action-buttons button:last-child {
+            background-color: #28a745;
+        }
+        .action-buttons button:last-child:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MEFTAHI IMMO</h1>
+        <p class="subtitle">Profile Diagnosis and Fix Tool</p>
+        
+        <div class="instructions">
+            <h3>What this tool does:</h3>
+            <ul>
+                <li>Diagnoses profile and authentication issues</li>
+                <li>Fixes missing or incorrect profile data</li>
+                <li>Ensures admin access is properly configured</li>
+            </ul>
+        </div>
+        
+        <div id="message"></div>
+        <div id="results" class="results" style="display: none;"></div>
+        
+        <button type="button" id="diagnoseBtn">
+            <span id="buttonText">Diagnose and Fix Profile Issues</span>
+        </button>
+        
+        <div class="action-buttons">
+            <button type="button" id="createAdminBtn" style="display: none;">
+                Create Admin Account
+            </button>
+            <button type="button" id="loginBtn" style="display: none;">
+                Go to Login Page
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(
+            'https://tcnumqnrunxoejnqykwt.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjbnVtcW5ydW54b2VqbnF5a3d0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjU3NTI3MiwiZXhwIjoyMDcyMTUxMjcyfQ.2mUWSO_Wg216A66qMVMhj4n4wnqbrSvyNFavaW-PCi8'
+        );
+        
+        const diagnoseBtn = document.getElementById('diagnoseBtn');
+        const createAdminBtn = document.getElementById('createAdminBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const buttonText = document.getElementById('buttonText');
+        const messageDiv = document.getElementById('message');
+        const resultsDiv = document.getElementById('results');
+        
+        function addResult(text) {
+            const resultElement = document.createElement('div');
+            resultElement.textContent = text;
+            resultsDiv.appendChild(resultElement);
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+        
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+            resultsDiv.style.display = 'none';
+        }
+        
+        async function diagnoseAndFixProfile() {
+            // Disable button and show loading
+            diagnoseBtn.disabled = true;
+            buttonText.innerHTML = '<span class="spinner"></span> Diagnosing...';
+            messageDiv.innerHTML = '';
+            clearResults();
+            
+            try {
+                addResult('🔍 Starting diagnosis...');
+                
+                // 1. List all users
+                addResult('📋 Listing all auth users...');
+                const { data: users, error: usersError } = await supabase.auth.admin.listUsers();
+                if (usersError) throw usersError;
+                
+                addResult(`Found ${users.users.length} user(s):`);
+                users.users.forEach((user, index) => {
+                    addResult(`  ${index + 1}. ${user.email} (ID: ${user.id})`);
+                });
+                
+                // 2. Check profiles table
+                addResult('📋 Checking profiles table...');
+                const { data: profiles, error: profilesError } = await supabase
+                    .from('profiles')
+                    .select('*');
+                if (profilesError) throw profilesError;
+                
+                addResult(`Found ${profiles.length} profile(s):`);
+                profiles.forEach((profile, index) => {
+                    addResult(`  ${index + 1}. ${profile.full_name || 'No name'} (${profile.id}) - Role: ${profile.role}`);
+                });
+                
+                // 3. Check for admin user
+                addResult('🔍 Looking for admin user...');
+                const { data: adminProfiles, error: adminError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('role', 'admin');
+                if (adminError) throw adminError;
+                
+                if (adminProfiles.length > 0) {
+                    addResult(`✅ Found ${adminProfiles.length} admin user(s):`);
+                    adminProfiles.forEach((profile, index) => {
+                        addResult(`  ${index + 1}. ${profile.full_name || 'No name'} (${profile.id})`);
+                    });
+                    
+                    // Show login button
+                    loginBtn.style.display = 'block';
+                    messageDiv.innerHTML = '<div class="message success"><strong>✅ Diagnosis complete!</strong><br>An admin user already exists. You can try logging in.</div>';
+                } else {
+                    addResult('⚠️ No admin users found.');
+                    
+                    // If there are users but no admin, make the first user an admin
+                    if (users.users.length > 0) {
+                        const firstUser = users.users[0];
+                        addResult(`🔧 Making ${firstUser.email} an admin...`);
+                        
+                        const { error: updateError } = await supabase
+                            .from('profiles')
+                            .upsert({
+                                id: firstUser.id,
+                                full_name: firstUser.user_metadata?.full_name || firstUser.email.split('@')[0],
+                                phone: firstUser.user_metadata?.phone || null,
+                                role: 'admin'
+                            }, {
+                                onConflict: 'id'
+                            });
+                        
+                        if (updateError) throw updateError;
+                        addResult('✅ Successfully made user an admin!');
+                        messageDiv.innerHTML = '<div class="message success"><strong>✅ Fixed!</strong><br>Admin user created. You can now log in.</div>';
+                        loginBtn.style.display = 'block';
+                    } else {
+                        addResult('❌ No users found in the system.');
+                        messageDiv.innerHTML = '<div class="message warning"><strong>⚠️ No users found.</strong><br>You need to create an admin account first.</div>';
+                        createAdminBtn.style.display = 'block';
+                    }
+                }
+                
+                // 4. Fix any profiles with missing data
+                addResult('🔧 Fixing profiles with missing data...');
+                for (const profile of profiles) {
+                    let needsUpdate = false;
+                    const updates = {};
+                    
+                    if (!profile.role) {
+                        updates.role = 'client';
+                        needsUpdate = true;
+                    }
+                    
+                    if (needsUpdate) {
+                        addResult(`  Fixing profile ${profile.id}...`);
+                        const { error: updateError } = await supabase
+                            .from('profiles')
+                            .update(updates)
+                            .eq('id', profile.id);
+                        if (updateError) throw updateError;
+                        addResult(`  ✅ Fixed profile ${profile.id}`);
+                    }
+                }
+                
+                addResult('🎉 Diagnosis and fixes complete!');
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="message error"><strong>❌ Error:</strong><br>${error.message}</div>`;
+                addResult(`❌ Error: ${error.message}`);
+            } finally {
+                // Re-enable button
+                diagnoseBtn.disabled = false;
+                buttonText.textContent = 'Diagnose and Fix Profile Issues';
+            }
+        }
+        
+        async function createAdminAccount() {
+            diagnoseBtn.disabled = true;
+            createAdminBtn.disabled = true;
+            buttonText.innerHTML = '<span class="spinner"></span> Creating Admin...';
+            messageDiv.innerHTML = '';
+            clearResults();
+            
+            try {
+                addResult('🔐 Creating admin account...');
+                
+                // Create admin user
+                const { data: authUser, error: signUpError } = await supabase.auth.admin.createUser({
+                    email: 'admin@meftahi-immo.tn',
+                    password: 'SecurePass123!',
+                    email_confirm: true,
+                    user_metadata: {
+                        full_name: 'Admin User',
+                        phone: '+216XXXXXXXX'
+                    }
+                });
+                
+                if (signUpError) {
+                    if (signUpError.message.includes('already exists')) {
+                        addResult('⚠️ Admin user already exists, updating profile...');
+                        // Get the existing user
+                        const { data: users, error: fetchError } = await supabase.auth.admin.listUsers();
+                        if (fetchError) throw fetchError;
+                        
+                        const existingUser = users.users.find(u => u.email === 'admin@meftahi-immo.tn');
+                        if (existingUser) {
+                            // Update profile to admin
+                            const { error: profileError } = await supabase
+                                .from('profiles')
+                                .upsert({
+                                    id: existingUser.id,
+                                    full_name: 'Admin User',
+                                    phone: '+216XXXXXXXX',
+                                    role: 'admin'
+                                }, {
+                                    onConflict: 'id'
+                                });
+                            
+                            if (profileError) throw profileError;
+                            addResult('✅ Profile updated to admin role!');
+                        }
+                    } else {
+                        throw signUpError;
+                    }
+                } else {
+                    addResult('✅ Auth user created successfully');
+                    
+                    // Create profile with admin role
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .upsert({
+                            id: authUser.user.id,
+                            full_name: 'Admin User',
+                            phone: '+216XXXXXXXX',
+                            role: 'admin'
+                        }, {
+                            onConflict: 'id'
+                        });
+                    
+                    if (profileError) throw profileError;
+                    addResult('✅ Profile created with admin role!');
+                }
+                
+                messageDiv.innerHTML = '<div class="message success"><strong>✅ Success!</strong><br>Admin account created/updated. You can now log in.</div>';
+                loginBtn.style.display = 'block';
+                createAdminBtn.style.display = 'none';
+                addResult('🎉 Admin account ready!');
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="message error"><strong>❌ Error:</strong><br>${error.message}</div>`;
+                addResult(`❌ Error: ${error.message}`);
+            } finally {
+                diagnoseBtn.disabled = false;
+                createAdminBtn.disabled = false;
+                buttonText.textContent = 'Diagnose and Fix Profile Issues';
+            }
+        }
+        
+        // Event listeners
+        diagnoseBtn.addEventListener('click', diagnoseAndFixProfile);
+        createAdminBtn.addEventListener('click', createAdminAccount);
+        loginBtn.addEventListener('click', function() {
+            window.open('http://localhost:3001/login', '_blank');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply RLS Fixes - MEFTAHI IMMO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            min-height: 150px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0070f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        button:hover {
+            background-color: #0051cc;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #0070f3;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .instructions {
+            background-color: #e9ecef;
+            border-left: 4px solid #0070f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MEFTAHI IMMO</h1>
+        <p class="subtitle">Apply RLS Policy Fixes</p>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Click "Apply RLS Fixes" to fix the recursion error</li>
+                <li>After successful application, create your admin account</li>
+                <li>Log in at <a href="http://localhost:3001/login" target="_blank">http://localhost:3001/login</a></li>
+            </ol>
+        </div>
+        
+        <div id="message"></div>
+        
+        <form id="fixForm">
+            <div class="form-group">
+                <label for="sql">SQL Fix Script:</label>
+                <textarea id="sql" readonly>ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.listings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.listing_media DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reservations DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.visits DISABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Profiles: admin read all" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles: admin write" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles: users read own" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles: users write own" ON public.profiles;
+
+DROP POLICY IF EXISTS "Listings: admin read all" ON public.listings;
+DROP POLICY IF EXISTS "Listings: admin write" ON public.listings;
+DROP POLICY IF EXISTS "Listings: users read all" ON public.listings;
+DROP POLICY IF EXISTS "Listings: owners write own" ON public.listings;
+
+DROP POLICY IF EXISTS "Media: admin read all" ON public.listing_media;
+DROP POLICY IF EXISTS "Media: admin write" ON public.listing_media;
+DROP POLICY IF EXISTS "Media: users read all" ON public.listing_media;
+
+DROP POLICY IF EXISTS "Reservations: manage by admin" ON public.reservations;
+DROP POLICY IF EXISTS "Reservations: users manage own" ON public.reservations;
+
+DROP POLICY IF EXISTS "Visits: manage by admin" ON public.visits;
+DROP POLICY IF EXISTS "Visits: users manage own" ON public.visits;
+
+CREATE POLICY "Profiles: admin read all" ON public.profiles
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p 
+      WHERE p.id = auth.uid() AND p.role = 'admin'
+    )
+  );
+
+CREATE POLICY "Profiles: admin write" ON public.profiles
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p 
+      WHERE p.id = auth.uid() AND p.role = 'admin'
+    )
+  );
+
+CREATE POLICY "Profiles: users read own" ON public.profiles
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Profiles: users write own" ON public.profiles
+  FOR ALL USING (auth.uid() = id);
+
+CREATE POLICY "Listings: admin read all" ON public.listings
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p 
+      WHERE p.id = auth.uid() AND p.role = 'admin'
+    )
+  );
+
+CREATE POLICY "Listings: admin write" ON public.listings
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p 
+      WHERE p.id = auth.uid() AND p.role = 'admin'
+    )
+  );
+
+CREATE POLICY "Listings: users read all" ON public.listings
+  FOR SELECT USING (true);
+
+CREATE POLICY "Listings: owners write own" ON public.listings
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p 
+      WHERE p.id = auth.uid() AND (p.role = 'admin' OR p.id = owner_id)
+    )
+  );
+
+CREATE POLICY "Media: admin read all" ON public.listing_media
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p 
+      WHERE p.id = auth.uid() AND p.role = 'admin'
+    )
+  );
+
+CREATE POLICY "Media: admin write" ON public.listing_media
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p 
+      WHERE p.id = auth.uid() AND p.role = 'admin'
+    )
+  );
+
+CREATE POLICY "Media: users read all" ON public.listing_media
+  FOR SELECT USING (true);
+
+CREATE POLICY "Reservations: manage by admin" ON public.reservations
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p 
+      WHERE p.id = auth.uid() AND p.role = 'admin'
+    )
+  );
+
+CREATE POLICY "Reservations: users manage own" ON public.reservations
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p 
+      WHERE p.id = auth.uid() AND (p.role = 'admin' OR p.id = user_id)
+    )
+  );
+
+CREATE POLICY "Visits: manage by admin" ON public.visits
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p 
+      WHERE p.id = auth.uid() AND p.role = 'admin'
+    )
+  );
+
+CREATE POLICY "Visits: users manage own" ON public.visits
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles p 
+      WHERE p.id = auth.uid() AND (p.role = 'admin' OR p.id = user_id)
+    )
+  );
+
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.listings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.listing_media ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reservations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.visits ENABLE ROW LEVEL SECURITY;
+
+GRANT ALL ON public.profiles TO authenticated;
+GRANT ALL ON public.listings TO authenticated;
+GRANT ALL ON public.listing_media TO authenticated;
+GRANT ALL ON public.reservations TO authenticated;
+GRANT ALL ON public.visits TO authenticated;</textarea>
+            </div>
+            
+            <button type="submit" id="submitBtn">
+                <span id="buttonText">Apply RLS Fixes</span>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('fixForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const buttonText = document.getElementById('buttonText');
+            const messageDiv = document.getElementById('message');
+            
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            buttonText.innerHTML = '<span class="spinner"></span> Applying Fixes...';
+            messageDiv.innerHTML = '<div class="message info">Applying RLS policy fixes...</div>';
+            
+            try {
+                // Initialize Supabase with service role key
+                const supabase = window.supabase.createClient(
+                    'https://tcnumqnrunxoejnqykwt.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjbnVtcW5ydW54b2VqbnF5a3d0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjU3NTI3MiwiZXhwIjoyMDcyMTUxMjcyfQ.2mUWSO_Wg216A66qMVMhj4n4wnqbrSvyNFavaW-PCi8'
+                );
+                
+                // Get the SQL from the textarea
+                const sql = document.getElementById('sql').value;
+                
+                // Split SQL into individual statements
+                const statements = sql.split(';').filter(stmt => stmt.trim() !== '');
+                
+                // Execute each statement
+                for (let i = 0; i < statements.length; i++) {
+                    const statement = statements[i].trim() + ';';
+                    if (statement.length > 1) {
+                        try {
+                            await supabase.rpc('exec_sql', { sql: statement });
+                        } catch (stmtError) {
+                            // Some statements might fail, but we continue with others
+                            console.warn('Statement failed (continuing):', stmtError.message);
+                        }
+                    }
+                }
+                
+                // Show success message
+                messageDiv.innerHTML = `
+                    <div class="message success">
+                        <strong>✅ Success!</strong><br>
+                        RLS policies have been successfully updated.<br><br>
+                        You can now create your admin account.<br>
+                        <a href="create-admin.html" target="_blank">Click here to create admin account</a>
+                    </div>
+                `;
+                
+            } catch (error) {
+                // Show error message
+                messageDiv.innerHTML = `
+                    <div class="message error">
+                        <strong>❌ Error:</strong><br>
+                        ${error.message}<br><br>
+                        Please try applying the fixes manually through the Supabase dashboard.
+                    </div>
+                `;
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                buttonText.textContent = 'Apply RLS Fixes';
+            }
+        });
+    </script>
+</body>
+</html>

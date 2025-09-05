@@ -1,41 +1,56 @@
 @echo off
-REM Deployment script for MEFTAHI IMMO
-REM This script builds and prepares the application for deployment
+cls
+title MEFTAHI IMMO - Deployment
+color 0A
 
-echo 🚀 Starting MEFTAHI IMMO deployment process...
+echo =====================================================
+echo MEFTAHI IMMO - COMPLETE DEPLOYMENT
+echo =====================================================
+echo.
+echo Project: MEFTAHI IMMO (Real Estate Platform)
+echo Location: d:\BIZERTA_IMMO
+echo Supabase Project: https://pvfzwnieerksnfusyidy.supabase.co
+echo.
 
-REM Check if Node.js is installed
-node --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ❌ Node.js is not installed. Please install Node.js 18+
-    exit /b 1
-)
+echo This script will:
+echo 1. Initialize your Supabase database
+echo 2. Verify all tables and policies
+echo 3. Start the development server
+echo 4. Open your browser to the application
+echo.
 
-REM Check if npm is installed
-npm --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ❌ npm is not installed. Please install npm
-    exit /b 1
-)
+echo Press any key to begin deployment...
+pause >nul
 
-echo ✅ Node.js and npm are installed
+echo.
+echo 1. Initializing Supabase database...
+echo =================================
+cd /d D:\BIZERTA_IMMO
+call setup-new-db.bat
 
-REM Install dependencies
-echo 📦 Installing dependencies...
-npm install
+echo.
+echo 2. Verifying database setup...
+echo ===========================
+node check-database.js
 
-REM Check if build succeeds
-echo 🏗️ Building the application...
-npm run build
-if %errorlevel% equ 0 (
-    echo ✅ Build successful!
-) else (
-    echo ❌ Build failed. Please check the errors above.
-    exit /b 1
-)
+echo.
+echo 3. Starting development server...
+echo ==============================
+start http://localhost:3000
+npm run dev
 
-echo 🎉 Deployment preparation completed!
-echo Next steps:
-echo 1. Set up your Supabase project
-echo 2. Configure environment variables
-echo 3. Deploy to your hosting platform
+echo.
+echo 🎉 DEPLOYMENT COMPLETE!
+echo ======================
+echo.
+echo Your MEFTAHI IMMO platform is now running at:
+echo 🔗 http://localhost:3000
+echo.
+echo Admin Panel: http://localhost:3000/admin
+echo Registration: http://localhost:3000/register
+echo Login: http://localhost:3000/login
+echo.
+echo First user will automatically get admin role!
+echo.
+echo Press any key to exit...
+pause >nul

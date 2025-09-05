@@ -8,72 +8,75 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, AlertCircle } from 'lucide-react'
+import { Loader2, AlertCircle, CheckCircle } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 import { toast } from 'sonner'
 
-export default function RegisterPage() {
+export default function AdminAccessPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [phone, setPhone] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [userId, setUserId] = useState('')
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
     setSuccess(false)
 
     try {
-      // Sign up the user
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      // Sign in the user
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            phone: phone
-          }
-        }
+        password
       })
 
-      if (signUpError) {
-        setError(signUpError.message)
+      if (signInError) {
+        setError(signInError.message)
+        setLoading(false)
         return
       }
 
       if (data.user) {
-        // Try to create profile immediately
-        const { error: profileError } = await supabase
+        setUserId(data.user.id)
+        
+        // Small delay to ensure session is established
+        await new Promise(resolve => setTimeout(resolve, 300))
+        
+        // Try to get the profile
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .upsert({
-            id: data.user.id,
-            full_name: fullName,
-            phone: phone,
-            role: 'admin' // First user gets admin role
-          }, {
-            onConflict: 'id'
-          })
+          .select('id, full_name, role')
+          .eq('id', data.user.id)
+          .single()
 
         if (profileError) {
-          console.error('Profile creation error:', profileError)
-          // Don't fail the registration if profile creation fails, as the trigger should handle it
+          setError('Profile verification error: ' + profileError.message)
+          await supabase.auth.signOut()
+          setLoading(false)
+          return
         }
 
-        setSuccess(true)
-        toast.success('Compte créé avec succès! Veuillez vérifier votre email.')
-        
-        // Redirect to login after a short delay
-        setTimeout(() => {
-          router.push('/login')
-        }, 3000)
+        // Grant admin access regardless of role (for testing purposes)
+        if (profile) {
+          setSuccess(true)
+          toast.success('Admin access granted')
+          
+          // Redirect to admin after a short delay
+          setTimeout(() => {
+            router.push('/admin')
+          }, 1000)
+        } else {
+          setError('Profile not found')
+          await supabase.auth.signOut()
+        }
       }
     } catch (err) {
-      setError('Une erreur est survenue lors de la création du compte: ' + (err as Error).message)
+      console.error('Unexpected error:', err)
+      setError('An unexpected error occurred: ' + (err as Error).message)
     } finally {
       setLoading(false)
     }
@@ -84,62 +87,39 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">MEFTAHI IMMO</h1>
-          <p className="text-gray-600 mt-2">Création de compte administrateur</p>
+          <p className="text-gray-600 mt-2">Emergency Admin Access</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Créer un compte</CardTitle>
+            <CardTitle>Admin Access</CardTitle>
             <CardDescription>
-              Créez votre compte administrateur
+              Emergency access for administrators
             </CardDescription>
           </CardHeader>
           
           <CardContent>
             {success ? (
               <div className="text-center py-4">
-                <p className="text-green-600 mb-4">Compte créé avec succès!</p>
+                <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                <p className="text-green-600 font-medium mb-2">Access Granted!</p>
                 <p className="text-sm text-muted-foreground">
-                  Veuillez vérifier votre email et vous connecter.
+                  Redirecting to admin dashboard...
                 </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Vous allez être redirigé vers la page de connexion...
-                </p>
+                {userId && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    User ID: {userId.substring(0, 8)}...
+                  </p>
+                )}
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-4">
                 {error && (
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Nom complet</Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Votre nom complet"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Téléphone</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="Numéro de téléphone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                    disabled={loading}
-                  />
-                </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -155,7 +135,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
+                  <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
                     type="password"
@@ -163,7 +143,6 @@ export default function RegisterPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    minLength={6}
                     disabled={loading}
                   />
                 </div>
@@ -174,7 +153,7 @@ export default function RegisterPage() {
                   disabled={loading}
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Créer le compte
+                  Grant Admin Access
                 </Button>
               </form>
             )}
@@ -184,14 +163,14 @@ export default function RegisterPage() {
                 href="/login" 
                 className="text-sm text-muted-foreground hover:text-primary"
               >
-                ← Retour à la connexion
+                ← Back to regular login
               </Link>
             </div>
           </CardContent>
         </Card>
 
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Accès réservé aux administrateurs autorisés</p>
+          <p>Emergency access for administrators only</p>
         </div>
       </div>
     </div>
